@@ -1,0 +1,259 @@
+\documentclass[a4paper, 12pt]{article}
+
+\newcommand{\languages}{english, french}
+
+\input{include/head.tex}
+
+%%%%%%%%%%%%%%%%%%%
+
+\title{Projet 1 - La planche de Galton}
+\newcommand{\subtitle}{Éléments du calcul des probabilités}
+\author{
+	Bastien \textsc{Hoffmann} (20161283)\\Maxime \textsc{Meurisse} (20161278)\\
+}
+\newcommand{\context}{2\ieme{} année de Bachelier Ingénieur Civil}
+\date{Année académique 2017-2018}
+
+%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+
+%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+    \newgeometry{margin = 2.5cm}
+	\makeatletter
+	\begin{titlepage}
+		\begin{minipage}[t][0.425\textheight][t]{\textwidth}
+			\begin{center}
+				\includegraphics[height=0.15\textheight]{resources/pdf/logo-uliege.pdf}
+				\vfill
+				{\huge \textsc{Université de Liège}}
+				\vfill
+			\end{center}
+		\end{minipage}
+		\vfill
+		\begin{minipage}{\textwidth}
+			\hspace{6pt}
+			\begin{mdframed}[linewidth = 2pt, innertopmargin = 12pt, innerbottommargin = 12pt, leftline = false, rightline = false]
+				\begin{center}
+					{\huge \bfseries \@title}
+				\end{center}
+			\end{mdframed}
+			\hspace{6pt}
+		\end{minipage}
+		\vfill
+		\begin{minipage}[b][0.425\textheight][t]{\textwidth}
+			\begin{center}
+				{\LARGE \subtitle}
+				\vfill
+				{\large \@author\space}
+				\vfill
+				{\large \context \\[6pt] \@date}
+			\end{center}
+		\end{minipage}
+	\end{titlepage}
+	\makeatother
+	\restoregeometry
+	\section{Méthode de Lehman \& Leighton}
+	Dans cette section, on cherche une solution exacte au problème par la construction d'un arbre de probabilités en utilisant la méthode de Lehman \& Leighton.\par
+	Les variables du problème sont le choix de l'entrée par le joueur et la sortie dans laquelle la boule tombera. L'événement étudié est la probabilité que la boule atteigne une sortie particulière. Toutes les sorties étant intéressantes, on étudiera toutes les feuilles de l'arbre.
+	\subsection{Position initiale de la boule aléatoire}
+	Dans ce cas, on suppose que le joueur choisit la position initiale de la boule au hasard et de manière équiprobable.\par
+	\input{include/trees/tree-1a.tex}
+	Pour obtenir la probabilité d'une feuille, on multiplie les probabilités se trouvant sur la branche menant à celle-ci. On additionne ensuite les probabilités des feuilles correspondantes afin d'obtenir la distribution de probabilités des sorties.\par
+	En appelant \(\varepsilon_1\), \(\varepsilon_2\) et \(\varepsilon_3\) les événements tels que la boule tombe respectivement dans la sortie 1, 2 et 3, on obtient les résultats présentés dans le tableau \ref{table:tab_Q1a}.\par
+	\begin{table}[!h]
+        \centering
+        \begin{tabular}{|c|c|c|}
+            \hline
+            \textbf{Événement} & \multicolumn{2}{c|}{\textbf{Probabilité}}\\
+            \hline
+            \hline
+            \(\varepsilon_1\) & 11/32 & \(\SI{0.3438}{}\)\\
+            \hline
+            \(\varepsilon_2\) & 10/32 & \(\SI{0.3125}{}\)\\
+            \hline
+            \(\varepsilon_3\) & 11/32 & \(\SI{0.3438}{}\)\\
+            \hline
+        \end{tabular}
+        \caption{Distribution de probabilités lorsque la position initiale de la boule est aléatoire.}
+        \label{table:tab_Q1a}
+    \end{table}
+    On constate que la probabilité de tomber dans une sortie périphérique est plus grande que celle de tomber dans la sortie centrale. Cela peut se justifier par le fait que les bords de la planche contraignent la boule à prendre une direction particulière.
+    \subsection{Position initiale de la boule fixée}
+    Dans ce cas, on suppose que le joueur choisit toujours la rangée la plus à gauche (position 1) comme entrée. On peut d'ores et déjà supposer que la sortie 3 ne pourra être atteinte du au manque de rangées de clous pouvant l'orienter vers cette sortie.\par
+    \input{include/trees/tree-1b.tex}
+    En considérant les mêmes événements que précédemment, on obtient les résultats présentés dans le tableau \ref{table:tab_Q1b}.\par
+    \begin{table}[!h]
+        \centering
+        \begin{tabular}{|c|c|c|}
+            \hline
+            \textbf{Événement} & \multicolumn{2}{c|}{\textbf{Probabilité}}\\
+            \hline
+            \hline
+            \(\varepsilon_1\) & 3/4 & \(\SI{0.75}{}\)\\
+            \hline
+            \(\varepsilon_2\) & 1/4 & \(\SI{0.25}{}\)\\
+            \hline
+            \(\varepsilon_3\) & 0 & \(\SI{0}{}\)\\
+            \hline
+        \end{tabular}
+        \caption{Distribution de probabilités lorsque la position initiale de la boule est l'entrée la plus à gauche.}
+        \label{table:tab_Q1b}
+    \end{table}
+    Comme attendu, la sortie 3 ne peut être atteinte par aucune boule.
+	\paragraph{Remarque} Dans les deux cas étudiés, le second axiome de Kolmogorov est vérifié: la somme des probabilités de chaque événement vaut bien \(\SI{1}{}\).
+	\section{Méthode de Monte Carlo}
+	\subsection{Simulation pour une planche de jeu simplifiée}
+	Les simulations sont effectuées par la fonction \texttt{GameSimulation}\footnote{Tous les scripts et fonctions mentionnés dans ce document se trouvent en annexe.}. Celle-ci génère le vecteur des entrées (aléatoires ou non) et appelle la fonction \texttt{BallSimulation} avec ce vecteur en paramètre. Cette fonction retourne, quant à elle, pour chaque position d'entrée fournie, une position de sortie.\par
+	Les distributions de probabilités sont ensuite calculées par la fonction \texttt{GetProb} qui, pour chaque vecteur, divise le nombre de boules tombées dans une sortie \(x\) par le nombre total de boules simulées.\par
+	Ces fonctions sont appelées, avec les paramètres adéquats, par le script \texttt{Q2a.m}.\par
+	Les résultats obtenus pour deux parties, simulant chacune \(10^4\) boules, sont présentés dans le tableau \ref{table:tab_Q2a}.\par
+	\begin{table}[!h]
+	    \centering
+	    \begin{tabular}{|c|c|c|c|}
+            \hline
+            \textbf{Événement} & \textbf{Position aléatoire} & \textbf{Position fixée}\\
+            \hline
+            \hline
+            \(\varepsilon_1\) & \(\SI{0.3392}{}\) & \(\SI{0.7514}{}\)\\
+            \hline
+            \(\varepsilon_2\) & \(\SI{0.3166}{}\) & \(\SI{0.2586}{}\)\\
+            \hline
+            \(\varepsilon_3\) & \(\SI{0.3442}{}\) & \(\SI{0}{}\)\\
+            \hline
+        \end{tabular}
+        \caption{Estimations des distributions de probabilités.}
+        \label{table:tab_Q2a}
+    \end{table}
+    On constate que ces résultats sont fort proches des résultats théoriques.
+    \subsection{Simulation pour une planche de jeu complète}
+    À l'aide de la fonction \texttt{GetExpValue}, pour chacune des parties simulées, l'estimateur de l'espérance de gain du joueur a été calculé en faisait la moyenne, avec la fonction \texttt{mean} de Matlab, du vecteur des gains. Ce vecteur en question  est obtenu en associant à chaque sortie son gain correspondant.\par
+    En effectuant 5 simulations avec le script \texttt{Q2b.m}, on constate, pour un nombre de boules inférieur à \(10^3\), un écart important entre les résultats correspondants de chaque simulation (tableau \ref{table:tab_Q2b}).\par
+    \begin{table}[!h]
+        \centering
+        \begin{tabular}{|l|l|c|c|c|c|}
+            \hline
+            \textbf{Nombre de boules} & & \(10^1\) & \(10^2\) & \(10^3\) & \(10^4\)\\
+            \hline
+            \hline
+            \multirow{5}{*}{\textbf{Espérance} [\euro{}]} & Simulation 1 & \(\SI{-2.9000}{}\) & \(\SI{0.1400}{}\) & \(\SI{0.4170}{}\) & \(\SI{0.4152}{}\)\\
+            & Simulation 2 & \(\SI{-3.1000}{}\) & \(\SI{0.2900}{}\) & \(\SI{0.4410}{}\) & \(\SI{0.4730}{}\)\\
+            & Simulation 3 & \(\SI{3.8000}{}\) & \(\SI{1.1900}{}\) & \(\SI{0.6220}{}\) & \(\SI{0.4318}{}\)\\
+            & Simulation 4 & \(\SI{0.2000}{}\) & \(\SI{0.8600}{}\) & \(\SI{0.4150}{}\) & \(\SI{0.4267}{}\)\\
+            & Simulation 5 & \(\SI{-1.7000}{}\) & \(\SI{0.2100}{}\) & \(\SI{0.2960}{}\) & \(\SI{0.4137}{}\)\\
+            \hline
+        \end{tabular}
+        \caption{Estimations de l'espérance pour différents nombres de boules.}
+        \label{table:tab_Q2b}
+    \end{table}
+    On observe cependant que plus le nombre de boules simulées au sein d'une partie est élevé, plus l'évaluation de l'espérance semble converger vers une valeur avoisinant \(\SI{0.43}{}\).
+    \subsection{Répétition de l'expérience}
+    On répète \(\SI{1000}{}\) fois l'expérience précédente grâce au script \texttt{Q2c.m}. Les espérances obtenues sont conservées dans un tableau, dont on a calculé, par la suite, la moyenne et la variance à l'aide des fonctions \texttt{mean} et \texttt{var} de Matlab (tableau \ref{table:tab_Q2c}).\par
+    \begin{table}[!h]
+        \centering
+        \begin{tabular}{|l|c|c|c|c|c|}
+            \hline
+            \textbf{Nombre de boules} & \(10^1\) & \(10^2\) & \(10^3\) & \(10^4\) & \(10^5\)\\
+            \hline
+            \hline
+            \textbf{Moyenne} [\euro{}] & \(\SI{0.4200}{}\) & \(\SI{0.4498}{}\) & \(\SI{0.4739}{}\) & \(\SI{0.4728}{}\) & \(\SI{0.4712}{}\)\\
+            \hline
+            \textbf{Variance} [\euro{}\(^2\)] & \(\SI{2.4984}{}\) & \(\SI{0.2625}{}\) & \(\SI{2.7401e-2}{}\) & \(\SI{2.6899e-3}{}\) & \(\SI{2.5830e-4}{}\)\\
+            \hline
+        \end{tabular}
+        \caption{Moyenne et variance des 1000 estimations de l'espérance pour différents nombres de boules.}
+        \label{table:tab_Q2c}
+    \end{table}
+    On constate que les moyennes des estimations de l'espérance de chaque partie simulée avoisinent toutes une valeur proche de \(\SI{0.47}{}\). La précision de cette valeur s'accroît lorsque le nombre de boules simulées augmente.\par
+    La variance, quant à elle, diminue de manière significative lorsque la taille des vecteurs augmente. Il pourrait donc être intéressant de réaliser l'expérience avec \(10^5\) boules afin de minimiser au plus la dispersion des résultats obtenus.\par
+    Cependant, avec un tel nombre de boules, le temps de calcul augmente considérablement par rapport à la décimale supplémentaire obtenue. On peut donc se limiter aux résultats de \(10^4\) boules simulées.
+    \subsection{Détermination de l'entrée la plus avantageuse}
+    En effectuant, avec le script \texttt{Q2d.m}, une simulation de \(10^7\) boules\footnote{Ce nombre de boules a été choisi pour son bon rapport précision des résultats/temps de calcul.} pour chaque entrée, on trouve que l'entrée 6 possède l'espérance de gain la plus élevée (tableau \ref{table:tab_Q2d}).\par
+    \begin{table}[!h]
+        \centering
+        \begin{tabular}{|c|c|}
+            \hline
+            \textbf{Entrée} & \textbf{Espérance} [\euro{}]\\
+            \hline
+            1 & \(\SI{-0.1097}{}\)\\
+            \hline
+            2 & \(\SI{0.0248}{}\)\\
+            \hline
+            3 & \(\SI{0.3167}{}\)\\
+            \hline
+            4 & \(\SI{0.5700}{}\)\\
+            \hline
+            5 & \(\SI{0.7079}{}\)\\
+            \hline
+            \rowcolor[RGB]{230,230,230}6 & \(\SI{0.7562}{}\)\\
+            \hline
+            7 & \(\SI{0.7316}{}\)\\
+            \hline
+            8 & \(\SI{0.6478}{}\)\\
+            \hline
+            9 & \(\SI{0.5971}{}\)\\
+            \hline
+        \end{tabular}
+        \caption{Estimation de l'espérance pour chaque entrée possible du jeu.}
+        \label{table:tab_Q2d}
+    \end{table}
+    Cette valeur étant également supérieure à la valeur obtenue pour une entrée choisie aléatoirement, le joueur a tout intérêt à systématiquement placer sa boule dans l'entrée 6 s'il désire maximiser ses gains.
+    \subsection{Loi binomiale}
+    On définit l'expérience comme la déviation d'une boule sur un clou. N'étant associée qu'à deux résultats possibles (la boule est déviée à droite, appelé \og succès\fg{}, et la boule est déviée à gauche, appelé \og échec\fg{}), elle peut être assimilée à une expérience de Bernoulli.\par
+    La variable aléatoire \(\mathcal{X}\) est le résultat de \(n = 9\) expériences consécutives. Elle suit donc une loi binomiale, dont la probabilité du succès (\(p\)) est identique à la probabilité de l'échec (\(q\)), à savoir \(\SI{0.5}{}\).\par
+    Ces expériences étant toutes indépendantes, et la probabilité du succès étant constante, l'espérance et la variance de \(\mathcal{X}\) sont données respectivement par:
+    \begin{itemize}
+        \item \(E\left\{\mathcal{X}\right\} = np = 9\dfrac{1}{2} = \SI{4.5}{}\)
+        \item \(V\left\{\mathcal{X}\right\} = npq = 9\dfrac{1}{2}\dfrac{1}{2} = \SI{2.25}{}\)
+    \end{itemize}
+    \subsection{Convergence vers une loi gaussienne et loi de Cauchy}
+    \subsubsection*{Théorème de Moivre-Laplace}
+    On définit une nouvelle variable aléatoire \(\mathcal{Y}\) telle que
+    \begin{displaymath}
+        \mathcal{Y} = \mathcal{X} - E\left\{\mathcal{X}\right\}
+    \end{displaymath}
+    En vertu du \textit{théorème de Moivre-Laplace}, un cas particulier du \textit{théorème central-limite}, si le nombre de sorties est suffisamment grand, on peut approcher la distribution de \(\mathcal{X}\) (et donc de \(\mathcal{Y}\)) par une loi gaussienne.\par
+    En effet, ce théorème stipule que si \(\mathcal{X}_n\) forme une suite de variables aléatoires binomiales (ce qui est le cas ici), alors
+    \begin{displaymath}
+        \dfrac{\mathcal{X}_n - E\left\{\mathcal{X}\right\}}{\sigma\left\{\mathcal{X}\right\}}\rightarrow\mathcal{N}\left(0, 1\right)
+    \end{displaymath}
+    La variable aléatoire \(\mathcal{Y}\) n'étant pas divisée par la variance de \(\mathcal{X}\), elle est approximée par une loi gaussienne centrée, mais non réduite.
+    \subsubsection*{Loi de Cauchy}
+    Soit les variables aléatoires \(\mathcal{Y}\sim\mathcal{N}\left(0, 2\right)\), de moyenne nulle et de variance \(\SI{2}{}\), représentant le résultat d'une partie, et \(\mathcal{Z}\), le rapport entre les résultats de deux parties indépendantes.\par
+    En répétant \(\SI{1000}{}\) fois l'expérience demandée grâce au script \texttt{Q2f.m}, on obtient les résultats présentés dans le tableau \ref{table:tab_Q2f}.\par
+    \begin{table}[!h]
+        \centering
+        \begin{tabular}{|l|c|c|c|c|}
+            \hline
+            \textbf{Nombre de boules} & \(10^2\) & \(10^3\) & \(10^4\) & \(10^5\)\\
+            \hline
+            \hline
+            \textbf{Moyenne} & \(\SI{0.3221}{}\) & \(\SI{0.7114}{}\) & \(\SI{0.1897}{}\) & \(\SI{1.7588}{}\)\\
+            \hline
+            \textbf{Variance} & \(\SI{0.1997e3}{}\) & \(\SI{1.0072e3}{}\) & \(\SI{1.2815e3}{}\) & \(\SI{6.8937e3}{}\)\\
+            \hline
+        \end{tabular}
+        \caption{Moyenne et variance des 1000 estimations de l'espérance, calculées avec une loi normale, pour différents nombres de boules.}
+        \label{table:tab_Q2f}
+    \end{table}
+    On constate une forte divergence des résultats pour chaque nombre de boules simulé. Cela peut s'expliquer par le fait que le quotient de deux variables aléatoires réelles indépendantes suivant des lois normales standards, représenté ici par \(\mathcal{Z}\), suit une loi de Cauchy. Or celle-ci n'admet ni espérance ni écart-type, et par conséquent, ni variance, d'où ces résultats qui ne semblent pas converger vers une valeur précise.
+    \section*{En plus}
+	Dans le cadre de ce projet, nous avons développé une application mobile (\og Galton Board Simulator\fg{}, disponible sur le \href{https://play.google.com/store/apps/details?id=com.znkvzr.gbs}{Play Store} et l'\href{https://itunes.apple.com/fr/app/id1350941583?mt=8}{App Store}) afin de simuler de manière visuelle le problème.\par
+	Cette application n'a en aucun cas servi d'appui aux résultats présentés dans ce rapport. Elle a simplement été une occasion pour nous d'approfondir le sujet et d'améliorer nos compétences informatiques.
+	\appendix
+	\restoregeometry
+	\section{Code Matlab}
+	\subsection{Fonctions}
+	\lstinputlisting[style=MatLab, caption=Fonction \texttt{BallSimulation.m}.]{resources/m/BallSimulation.m}
+	\lstinputlisting[style=MatLab, caption=Fonction \texttt{GameSimulation.m}.]{resources/m/GameSimulation.m}
+	\lstinputlisting[style=MatLab, caption=Fonction \texttt{GetExpValue.m}.]{resources/m/GetExpValue.m}
+	\lstinputlisting[style=MatLab, caption=Fonction \texttt{GetProb.m}.]{resources/m/GetProb.m}
+	\subsection{Scripts}
+	\lstinputlisting[style=MatLab, caption=Script \texttt{Q2a.m}.]{resources/m/Q2a.m}
+	\lstinputlisting[style=MatLab, caption=Script \texttt{Q2b.m}.]{resources/m/Q2b.m}
+	\lstinputlisting[style=MatLab, caption=Script \texttt{Q2c.m}.]{resources/m/Q2c.m}
+	\lstinputlisting[style=MatLab, caption=Script \texttt{Q2d.m}.]{resources/m/Q2d.m}
+	\lstinputlisting[style=MatLab, caption=Script \texttt{Q2f.m}.]{resources/m/Q2f.m}
+\end{document}

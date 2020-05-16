@@ -1,0 +1,41 @@
+\begin{figure}[!h]
+	\centering
+    \begin{tikzpicture}[xscale=1,yscale=1]
+    \small
+    % Styles (MODIFIABLES)
+    \tikzstyle{fleche}=[->,>=latex,thick]
+    \tikzstyle{noeud}=[]
+    \tikzstyle{feuille}=[]
+    \tikzstyle{entree}=[]
+    \tikzstyle{etiquette}=[midway,fill=white, draw]
+    % Dimensions (MODIFIABLES)
+    \def\DistanceInterNiveaux{3}
+    \def\DistanceInterFeuilles{2}
+    % Dimensions calculées (NON MODIFIABLES)
+    \def\NiveauA{(0)*\DistanceInterNiveaux}
+    \def\NiveauB{(1)*\DistanceInterNiveaux}
+    \def\NiveauC{(2)*\DistanceInterNiveaux}
+    \def\NiveauD{(3)*\DistanceInterNiveaux}
+    \def\NiveauE{(4)*\DistanceInterNiveaux}
+    \def\InterFeuilles{(-1)*\DistanceInterFeuilles}
+    % Noeuds (MODIFIABLES : Styles et Coefficients d'InterFeuilles)
+    \node[entree] (R) at ({\NiveauA},{(1)*\InterFeuilles}) {Joueur};
+    \node[noeud] (Ra) at ({\NiveauB},{(1)*\InterFeuilles}) {$1$};
+    \node[noeud] (Raa) at ({\NiveauC},{(1)*\InterFeuilles}) {$1$};
+    \node[noeud] (Raaa) at ({\NiveauD},{(0)*\InterFeuilles}) {$1$};
+    \node[feuille] (Raaaa) at ({\NiveauE},{(0)*\InterFeuilles}) {$\bm{1}$};
+    \node[noeud] (Raab) at ({\NiveauD},{(1.5)*\InterFeuilles}) {$2$};
+    \node[feuille] (Raaba) at ({\NiveauE},{(1)*\InterFeuilles}) {$\bm{1}$};
+    \node[feuille] (Raabb) at ({\NiveauE},{(2)*\InterFeuilles}) {$\bm{2}$};
+    % Arcs (MODIFIABLES : Styles)
+    \draw[fleche] (R)--(Ra) node[etiquette] {$1$};
+    \draw[fleche] (Ra)--(Raa) node[etiquette] {$1$};
+    \draw[fleche] (Raa)--(Raaa) node[etiquette] {$0.5$};
+    \draw[fleche] (Raaa)--(Raaaa) node[etiquette] {$1$};
+    \draw[fleche] (Raa)--(Raab) node[etiquette] {$0.5$};
+    \draw[fleche] (Raab)--(Raaba) node[etiquette] {$0.5$};
+    \draw[fleche] (Raab)--(Raabb) node[etiquette] {$0.5$};
+    \end{tikzpicture}
+    \caption{Arbre de probabilités lorsque la position initiale de la boule est l'entrée la plus à gauche.}
+    \label{fig:tree-1b}
+\end{figure}

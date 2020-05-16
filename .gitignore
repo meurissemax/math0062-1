@@ -1,10 +1,6 @@
+##########
+# System #
+##########
+
+# macOS
 .DS_Store
-
-guidelines.pdf
-
-/Projet 1/Rapport/*
-!/Projet 1/Rapport/Rapport.pdf
-/Projet 1/Projet 1 - feedback.pdf
-
-/Projet 2/Rapport/*
-!/Projet 2/Rapport/Rapport.pdf

@@ -1,0 +1,585 @@
+\documentclass[a4paper, 12pt]{article}
+
+\newcommand{\languages}{english, french}
+
+\input{include/head.tex}
+
+%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\imgheader}{resources/pdf/logo-uliege.pdf}
+\newcommand{\institution}{Université de Liège}
+
+\title{Projet 2 - Modélisation de la défaillance d'une chaîne de production}
+\newcommand{\subtitle}{Éléments du calcul des probabilités}
+
+\author{Bastien \textsc{Hoffmann} (20161283)\\Maxime \textsc{Meurisse} (20161278)\\}
+
+\newcommand{\context}{2\ieme{} année de Bachelier Ingénieur Civil}
+\date{Année académique 2017-2018}
+
+%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+\renewcommand{\thesubsubsection}{\thesubsection.\roman{subsubsection}}
+
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\C}{\mathcal{C}}
+\newcommand{\K}{\mathcal{K}}
+\newcommand{\X}{\mathcal{X}}
+
+%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+	\newgeometry{margin = 2.5cm}
+	\makeatletter
+	\begin{titlepage}
+		\begin{minipage}[t][0.425\textheight][t]{\textwidth}
+			\begin{center}
+				\includegraphics[height=0.15\textheight]{\imgheader}
+				\vfill
+				{\huge \textsc{\institution}}
+				\vfill
+			\end{center}
+		\end{minipage}
+		\vfill
+		\begin{minipage}{\textwidth}
+			\hspace{6pt}
+			\begin{mdframed}[linewidth = 2pt, innertopmargin = 12pt, innerbottommargin = 12pt, leftline = false, rightline = false]
+				\begin{center}
+					{\huge \bfseries \@title}
+				\end{center}
+			\end{mdframed}
+			\hspace{6pt}
+		\end{minipage}
+		\vfill
+		\begin{minipage}[b][0.425\textheight][t]{\textwidth}
+			\begin{center}
+				{\LARGE \subtitle}
+				\vfill
+				{\large \@author\space}
+				\vfill
+				{\large \context \\[6pt] \@date}
+			\end{center}
+		\end{minipage}
+	\end{titlepage}
+	\makeatother
+	\restoregeometry
+	\section{Manipulation des lois de probabilités}
+	\subsection{Lois de probabilités marginales}
+	\label{sec:prob_marg}
+	Pour calculer les lois de probabilités marginales de chacune des variables aléatoires discrètes données, on marginalise la loi de probabilité jointe de ces 3 variables. Cela signifie que l'on considère tous les cas où une variable prend une valeur particulière et on somme les probabilités d'occurrence de chacun de ces cas. On effectue cette opération pour toutes les valeurs que peut prendre la variable:
+	\begin{align*}
+	    P_\M\left(i\right) &= \sum_{j=1}^{3}\sum_{k=1}^{5}P_{\M,\F,\C}\left(i,j,k\right) & \forall i=1,2,3,4\\
+	    P_\F\left(j\right) &= \sum_{i=1}^{4}\sum_{k=1}^{5}P_{\M,\F,\C}\left(i,j,k\right) & \forall j=1,2,3\\
+	    P_\C\left(k\right) &= \sum_{i=1}^{4}\sum_{j=1}^{3}P_{\M,\F,\C}\left(i,j,k\right) & \forall k=1,2,3,4,5
+	\end{align*}
+	Le script \texttt{Q1a}\footnote{Tous les scripts, et fonctions auxiliaires utilisées par ces scripts, mentionnés dans ce rapport se trouvent en annexe.}, implémentant ces formules par le biais de sommes sur deux dimensions de la matrice \texttt{MFC}, fournit les résultats présentés au tableau \ref{tab:tab_Q1a}.\par
+	\begin{table}[!ht]
+	    \centering
+	    \begin{tabular}{|c|c|c|c|c|}
+            \hline
+            \textbf{Type de panne} & \(P_\M\) & \(P_\F\) & \(P_\C\)\\
+            \hline
+            \hline
+            \(1\) & \(\num{0,350}\) & \(\num{0,340}\) & \(\num{0,200}\)\\
+            \hline
+            \(2\) & \(\num{0,370}\) & \(\num{0,310}\) & \(\num{0,310}\)\\
+            \hline
+            \(3\) & \(\num{0,120}\) & \(\num{0,350}\) & \(\num{0,220}\)\\
+            \hline
+            \(4\) & \(\num{0,160}\) & \textbackslash & \(\num{0,240}\)\\
+            \hline
+            \(5\) & \textbackslash & \textbackslash & \(\num{0,030}\)\\
+            \hline
+        \end{tabular}
+        \caption{Lois de probabilités marginales des variables \(\M\), \(\F\) et \(\C\).}
+        \label{tab:tab_Q1a}
+    \end{table}
+    Pour chaque machine, la somme des probabilités associées à ses pannes vaut 1 (vérifiant ainsi le second axiome de Kolmogorov), synonyme qu'elle présente toujours un état décrit par le type de panne.
+	\subsection{Lois de probabilités conjointes}
+	\label{subsec:subsec_Q1b}
+	Les lois de probabilités conjointes des paires de variables \(\left(\M,\F\right)\), \(\left(\M,\C\right)\) et \(\left(\F,\C\right)\) sont données, respectivement, par
+	\begin{align*}
+	    P_{\M,\F}\left(i,j\right) &= \sum_{k=1}^{5}P_{\M,\F,\C}\left(i,j,k\right) & \forall i = 1,2,3,4\quad\forall j = 1,2,3\\
+	    P_{\M,\C}\left(i,k\right) &= \sum_{j=1}^{3}P_{\M,\F,\C}\left(i,j,k\right) & \forall i = 1,2,3,4\quad\forall k = 1,2,3,4,5\\
+	    P_{\F,\C}\left(j,k\right) &= \sum_{i=1}^{4}P_{\M,\F,\C}\left(i,j,k\right) & \forall j = 1,2,3\quad\forall k = 1,2,3,4,5
+	\end{align*}
+	La loi de probabilité conjointe d'un couple de variables aléatoires est donc obtenue en sommant les probabilités de tous les cas où le couple prend une paire de valeurs particulière, et en répétant cette opération pour toutes les paires de valeurs possibles.\par
+	Le script \texttt{Q1b}, implémentant ces formules par le biais de sommes sur une dimension de la matrice \texttt{MFC}, fournit 3 tableaux (\ref{tab:tab_Q1b_i}, \ref{tab:tab_Q1b_ii} et \ref{tab:tab_Q1b_iii}) reprenant les 3 lois conjointes.\par
+	\begin{table}[!ht]
+	    \centering
+	    \begin{tabular}{|c|c|c|c|}
+            \hline
+            \textbf{Type de panne} & \textbf{$\F=1$} & \textbf{$\F=2$} & \textbf{$\F=3$}\\
+            \hline
+            \hline
+            \(\textbf{$\M=1$}\) & \(\num{0,1190}\) & \(\num{0,1085}\) & \(\num{0,1225}\)\\
+            \hline
+            \(\textbf{$\M=2$}\) & \(\num{0,1258}\) & \(\num{0,1147}\) & \(\num{0,1295}\)\\
+            \hline
+            \(\textbf{$\M=3$}\) & \(\num{0,0408}\) & \(\num{0,0372}\) & \(\num{0,0420}\)\\
+            \hline
+            \(\textbf{$\M=4$}\) & \(\num{0,0544}\) & \(\num{0,0496}\) & \(\num{0,0560}\)\\
+            \hline
+        \end{tabular}
+        \caption{Loi de probabilité conjointe de la paire de variables \(\left(\M,\F\right)\).}
+        \label{tab:tab_Q1b_i}
+    \end{table}
+    \begin{table}[!ht]
+	    \centering
+	    \begin{tabular}{|c|c|c|c|c|c|}
+            \hline
+            \textbf{Type de panne} & \textbf{$\C=1$} & \textbf{$\C=2$} & \textbf{$\C=3$} & \textbf{$\C=4$} & \textbf{$\C=5$}\\
+            \hline
+            \hline
+            \(\textbf{$\M=1$}\) & \(\num{0,0700}\) & \(\num{0,1085}\) & \(\num{0,0770}\) & \(\num{0,0840}\) & \(\num{0,0105}\)\\
+            \hline
+            \(\textbf{$\M=2$}\) & \(\num{0,0740}\) & \(\num{0,1147}\) & \(\num{0,0814}\) & \(\num{0,0888}\) & \(\num{0,0111}\)\\
+            \hline
+            \(\textbf{$\M=3$}\) & \(\num{0,0240}\) & \(\num{0,0372}\) & \(\num{0,0264}\) & \(\num{0,0288}\) & \(\num{0,0036}\)\\
+            \hline
+            \(\textbf{$\M=4$}\) & \(\num{0,0320}\) & \(\num{0,0496}\) & \(\num{0,0352}\) & \(\num{0,0384}\) & \(\num{0,0048}\)\\
+            \hline
+        \end{tabular}
+        \caption{Loi de probabilité conjointe de la paire de variables \(\left(\M,\C\right)\).}
+        \label{tab:tab_Q1b_ii}
+    \end{table}
+    \begin{table}[!ht]
+	    \centering
+	    \begin{tabular}{|c|c|c|c|c|c|}
+            \hline
+            \textbf{Type de panne} & \textbf{$\C=1$} & \textbf{$\C=2$} & \textbf{$\C=3$} & \textbf{$\C=4$} & \textbf{$\C=5$}\\
+            \hline
+            \hline
+            \(\textbf{$\F=1$}\) & \(\num{0,0820}\) & \(\num{0,1054}\) & \(\num{0,0814}\) & \(\num{0,0648}\) & \(\num{0,0064}\)\\
+            \hline
+            \(\textbf{$\F=2$}\) & \(\num{0,0640}\) & \(\num{0,0868}\) & \(\num{0,0748}\) & \(\num{0,0816}\) & \(\num{0,0028}\)\\
+            \hline
+            \(\textbf{$\F=3$}\) & \(\num{0,0540}\) & \(\num{0,1178}\) & \(\num{0,0638}\) & \(\num{0,0936}\) & \(\num{0,0208}\)\\
+            \hline
+            \end{tabular}
+        \caption{Loi de probabilité conjointe de la paire de variables \(\left(\F,\C\right)\).}
+        \label{tab:tab_Q1b_iii}
+    \end{table}
+	\subsection{Lois de probabilités conditionnelles}
+	\label{subsec:subsec_Q1c}
+	En se basant sur les résultats calculés au point précédent, on peut aisément déterminer les lois de probabilités conditionnelles demandées par
+	\begin{align*}
+	    P_{\M|\F,\C}\left(i|j,k\right) &= \dfrac{P_{\M}\left(i\right)\cap P_{\F, \C}\left(j,k\right)}{P_{\F,\C}\left(j,k\right)} = \dfrac{P_{\M,\F,\C}\left(i,j,k\right)}{P_{\F,\C}\left(j,k\right)}\\
+	    P_{\F|\M,\C}\left(j|i,k\right) &= \dfrac{P_{\M,\F,\C}\left(i,j,k\right)}{P_{\M,\C}\left(i,k\right)}\\
+	    P_{\C|\F,\M}\left(k|j,i\right) &= \dfrac{P_{\M,\F,\C}\left(i,j,k\right)}{P_{\F,\M}\left(j,i\right)}
+	\end{align*}
+	\begin{displaymath}
+	    \forall i=1,2,3,4 \qquad\forall j = 1,2,3\qquad\forall k = 1,2,3,4,5
+	\end{displaymath}
+	On observe en effet que, pour chaque cas, le numérateur est la probabilité conjointe des 3 variables du problème (donnée par la matrice \texttt{MFC}), et que le dénominateur est la probabilité conjointe correspondant aux variables conditionnelles (calculée au point \ref{subsec:subsec_Q1b}).\par
+	Le script \texttt{Q1c}, implémentant ces relations à l'aide de la fonction \texttt{bsxfun} de Matlab (utilisée pour effectuer des divisions élément par élément plus facilement), donne les résultats présentés aux tableaux \ref{tab:tab_Q1c_i}, \ref{tab:tab_Q1c_ii} et \ref{tab:tab_Q1c_iii}.\par
+	\begin{table}[!ht]
+	    \centering
+	    \begin{tabular}{|c|c|c|c|c|c|}
+            \hline
+            \cellcolor[RGB]{230,230,230}\textbf{Cas pour $\M = 1$} & \textbf{$\C=1$} & \textbf{$\C=2$} & \textbf{$\C=3$} & \textbf{$\C=4$} & \textbf{$\C=5$}\\
+            \hline
+            \hline
+            \(\textbf{$\F=1$}\) & \(0,3500\) & \(0,3500\) & \(0,3500\) & \(0,3500\) & \(0,3500\)\\
+            \hline
+            \(\textbf{$\F=2$}\) & \(0,3500\) & \(0,3500\) & \(0,3500\) & \(0,3500\) & \(0,3500\)\\
+            \hline
+            \(\textbf{$\F=3$}\) & \(0,3500\) & \(0,3500\) & \(0,3500\) & \(0,3500\) & \(0,3500\)\\
+            \hline
+        \end{tabular}
+        \vskip 1em
+	    \begin{tabular}{|c|c|c|c|c|c|}
+            \hline
+            \cellcolor[RGB]{230,230,230}\textbf{Cas pour $\M = 2$} & \textbf{$\C=1$} & \textbf{$\C=2$} & \textbf{$\C=3$} & \textbf{$\C=4$} & \textbf{$\C=5$}\\
+            \hline
+            \hline
+            \(\textbf{$\F=1$}\) & \(0,3700\) & \(0,3700\) & \(0,3700\) & \(0,3700\) & \(0,3700\)\\
+            \hline
+            \(\textbf{$\F=2$}\) & \(0,3700\) & \(0,3700\) & \(0,3700\) & \(0,3700\) & \(0,3700\)\\
+            \hline
+            \(\textbf{$\F=3$}\) & \(0,3700\) & \(0,3700\) & \(0,3700\) & \(0,3700\) & \(0,3700\)\\
+            \hline
+        \end{tabular}
+        \vskip 1em
+	    \begin{tabular}{|c|c|c|c|c|c|}
+            \hline
+            \cellcolor[RGB]{230,230,230}\textbf{Cas pour $\M = 3$} & \textbf{$\C=1$} & \textbf{$\C=2$} & \textbf{$\C=3$} & \textbf{$\C=4$} & \textbf{$\C=5$}\\
+            \hline
+            \hline
+            \(\textbf{$\F=1$}\) & \(0,1200\) & \(0,1200\) & \(0,1200\) & \(0,1200\) & \(0,1200\)\\
+            \hline
+            \(\textbf{$\F=2$}\) & \(0,1200\) & \(0,1200\) & \(0,1200\) & \(0,1200\) & \(0,1200\)\\
+            \hline
+            \(\textbf{$\F=3$}\) & \(0,1200\) & \(0,1200\) & \(0,1200\) & \(0,1200\) & \(0,1200\)\\
+            \hline
+        \end{tabular}
+        \vskip 1em
+        \begin{tabular}{|c|c|c|c|c|c|}
+            \hline
+            \cellcolor[RGB]{230,230,230}\textbf{Cas pour $\M = 4$} & \textbf{$\C=1$} & \textbf{$\C=2$} & \textbf{$\C=3$} & \textbf{$\C=4$} & \textbf{$\C=5$}\\
+            \hline
+            \hline
+            \(\textbf{$\F=1$}\) & \(0,1600\) & \(0,1600\) & \(0,1600\) & \(0,1600\) & \(0,1600\)\\
+            \hline
+            \(\textbf{$\F=2$}\) & \(0,1600\) & \(0,1600\) & \(0,1600\) & \(0,1600\) & \(0,1600\)\\
+            \hline
+            \(\textbf{$\F=3$}\) & \(0,1600\) & \(0,1600\) & \(0,1600\) & \(0,1600\) & \(0,1600\)\\
+            \hline
+        \end{tabular}    
+        \caption{Loi de probabilité conditionnelle de $\M$ connaissant \(\F\) et \(\C\).}
+        \label{tab:tab_Q1c_i}
+    \end{table}
+    \begin{table}[!h]
+	    \centering
+	    \begin{tabular}{|c|c|c|c|c|c|}
+            \hline
+            \cellcolor[RGB]{230,230,230}\textbf{Cas pour $\F = 1$} & \textbf{$\C=1$} & \textbf{$\C=2$} & \textbf{$\C=3$} & \textbf{$\C=4$} & \textbf{$\C=5$}\\
+            \hline
+            \hline
+            \(\textbf{$\M=1$}\) & \(0,4100\) & \(0,3400\) & \(0,3700\) & \(0,2700\) & \(0,2133\)\\
+            \hline
+            \(\textbf{$\M=2$}\) & \(0,4100\) & \(0,3400\) & \(0,3700\) & \(0,2700\) & \(0,2133\)\\
+            \hline
+            \(\textbf{$\M=3$}\) & \(0,4100\) & \(0,3400\) & \(0,3700\) & \(0,2700\) & \(0,2133\)\\
+            \hline
+            \(\textbf{$\M=4$}\) & \(0,4100\) & \(0,3400\) & \(0,3700\) & \(0,2700\) & \(0,2133\)\\
+            \hline
+        \end{tabular}
+        \vskip 1em
+        \begin{tabular}{|c|c|c|c|c|c|}
+            \hline
+            \cellcolor[RGB]{230,230,230}\textbf{Cas pour $\F = 2$} & \textbf{$\C=1$} & \textbf{$\C=2$} & \textbf{$\C=3$} & \textbf{$\C=4$} & \textbf{$\C=5$}\\
+            \hline
+            \hline
+            \(\textbf{$\M=1$}\) & \(0,3200\) & \(0,2800\) & \(0,3400\) & \(0,3400\) & \(0,0933\)\\
+            \hline
+            \(\textbf{$\M=2$}\) & \(0,3200\) & \(0,2800\) & \(0,3400\) & \(0,3400\) & \(0,0933\)\\
+            \hline
+            \(\textbf{$\M=3$}\) & \(0,3200\) & \(0,2800\) & \(0,3400\) & \(0,3400\) & \(0,0933\)\\
+            \hline
+            \(\textbf{$\M=4$}\) & \(0,3200\) & \(0,2800\) & \(0,3400\) & \(0,3400\) & \(0,0933\)\\
+            \hline
+        \end{tabular}
+        \vskip 1em
+        \begin{tabular}{|c|c|c|c|c|c|}
+            \hline
+            \cellcolor[RGB]{230,230,230}\textbf{Cas pour $\F = 3$} & \textbf{$\C=1$} & \textbf{$\C=2$} & \textbf{$\C=3$} & \textbf{$\C=4$} & \textbf{$\C=5$}\\
+            \hline
+            \hline
+            \(\textbf{$\M=1$}\) & \(0,2700\) & \(0,3800\) & \(0,2900\) & \(0,3900\) & \(0,6933\)\\
+            \hline
+            \(\textbf{$\M=2$}\) & \(0,2700\) & \(0,3800\) & \(0,2900\) & \(0,3900\) & \(0,6933\)\\
+            \hline
+            \(\textbf{$\M=3$}\) & \(0,2700\) & \(0,3800\) & \(0,2900\) & \(0,3900\) & \(0,6933\)\\
+            \hline
+            \(\textbf{$\M=4$}\) & \(0,2700\) & \(0,3800\) & \(0,2900\) & \(0,3900\) & \(0,6933\)\\
+            \hline
+        \end{tabular}
+        \caption{Loi de probabilité conditionnelle de $\F$ connaissant \(\M\) et \(\C\).}
+        \label{tab:tab_Q1c_ii}
+    \end{table}
+    \begin{table}[!h]
+	    \centering
+	    \begin{tabular}{|c|c|c|c|c|}
+            \hline
+            \cellcolor[RGB]{230,230,230}\textbf{Cas pour $\C = 1$} & \textbf{$\M=1$} & \textbf{$\M=2$} & \textbf{$\M=3$} & \textbf{$\M=4$}\\
+            \hline
+            \hline
+            \(\textbf{$\F=1$}\) & \(0,2412\) & \(0,2412\) & \(0,2412\) & \(0,2412\)\\
+            \hline
+            \(\textbf{$\F=2$}\) & \(0,2065\) & \(0,2065\) & \(0,2065\) & \(0,2065\)\\
+            \hline
+            \(\textbf{$\F=3$}\) & \(0,1543\) & \(0,1543\) & \(0,1543\) & \(0,1543\)\\
+            \hline
+        \end{tabular}
+        \vskip 1em
+        \begin{tabular}{|c|c|c|c|c|}
+            \hline
+            \cellcolor[RGB]{230,230,230}\textbf{Cas pour $\C = 2$} & \textbf{$\M=1$} & \textbf{$\M=2$} & \textbf{$\M=3$} & \textbf{$\M=4$}\\
+            \hline
+            \hline
+            \(\textbf{$\F=1$}\) & \(0,3100\) & \(0,3100\) & \(0,3100\) & \(0,3100\)\\
+            \hline
+            \(\textbf{$\F=2$}\) & \(0,2800\) & \(0,2800\) & \(0,2800\) & \(0,2800\)\\
+            \hline
+            \(\textbf{$\F=3$}\) & \(0,3366\) & \(0,3366\) & \(0,3366\) & \(0,3366\)\\
+            \hline
+        \end{tabular}
+        \vskip 1em
+        \begin{tabular}{|c|c|c|c|c|}
+            \hline
+            \cellcolor[RGB]{230,230,230}\textbf{Cas pour $\C = 3$} & \textbf{$\M=1$} & \textbf{$\M=2$} & \textbf{$\M=3$} & \textbf{$\M=4$}\\
+            \hline
+            \hline
+            \(\textbf{$\F=1$}\) & \(0,2394\) & \(0,2394\) & \(0,2394\) & \(0,2394\)\\
+            \hline
+            \(\textbf{$\F=2$}\) & \(0,2413\) & \(0,2413\) & \(0,2413\) & \(0,2413\)\\
+            \hline
+            \(\textbf{$\F=3$}\) & \(0,1823\) & \(0,1823\) & \(0,1823\) & \(0,1823\)\\
+            \hline
+        \end{tabular}
+        \vskip 1em
+        \begin{tabular}{|c|c|c|c|c|}
+            \hline
+            \cellcolor[RGB]{230,230,230}\textbf{Cas pour $\C = 4$} & \textbf{$\M=1$} & \textbf{$\M=2$} & \textbf{$\M=3$} & \textbf{$\M=4$}\\
+            \hline
+            \hline
+            \(\textbf{$\F=1$}\) & \(0,1906\) & \(0,1906\) & \(0,1906\) & \(0,1906\)\\
+            \hline
+            \(\textbf{$\F=2$}\) & \(0,2632\) & \(0,2632\) & \(0,2632\) & \(0,2632\)\\
+            \hline
+            \(\textbf{$\F=3$}\) & \(0,2674\) & \(0,2674\) & \(0,2674\) & \(0,2674\)\\
+            \hline
+        \end{tabular}
+        \vskip 1em
+        \begin{tabular}{|c|c|c|c|c|}
+            \hline
+            \cellcolor[RGB]{230,230,230}\textbf{Cas pour $\C = 5$} & \textbf{$\M=1$} & \textbf{$\M=2$} & \textbf{$\M=3$} & \textbf{$\M=4$}\\
+            \hline
+            \hline
+            \(\textbf{$\F=1$}\) & \(0,0188\) & \(0,0188\) & \(0,0188\) & \(0,0188\)\\
+            \hline
+            \(\textbf{$\F=2$}\) & \(0,0090\) & \(0,0090\) & \(0,0090\) & \(0,0090\)\\
+            \hline
+            \(\textbf{$\F=3$}\) & \(0,0594\) & \(0,0594\) & \(0,0594\) & \(0,0594\)\\
+            \hline
+        \end{tabular}
+        \caption{Loi de probabilité conditionnelle de $\C$ connaissant \(\F\) et \(\M\).}
+        \label{tab:tab_Q1c_iii}
+    \end{table}
+    \restoregeometry
+    \subsection{Relations entre les variables aléatoires}
+	En observant les différents résultats obtenus précédemment, on peut déduire du tableau \ref{tab:tab_Q1c_i} que la variable $\M$ est indépendante des variables $\F$ et $\C$. En effet, pour une valeur fixée de \(\M\), peu importe les valeurs de \(\F\) et \(\C\), la probabilité est toujours la même.\par
+	Les tableaux \ref{tab:tab_Q1c_ii} et \ref{tab:tab_Q1c_iii}, quant à eux, montrent que les variables \(\F\) et \(\C\) sont dépendantes l'une de l'autre. On constate, en effet, qu'en fixant la valeur d'une variable et en faisant varier la valeur de l'autre, les probabilités diffèrent.
+	\section{Probabilités des pannes}
+	\subsection{Panne de la chaîne de production}
+	\label{subsec:subsec_Q2a}
+	La probabilité que la chaîne de production tombe en panne correspond à la probabilité qu'au moins une des machines tombe en panne. La probabilité de cet événement peut être calculée en déterminant la probabilité de l'événement contraire, à savoir qu'aucune machine ne tombe en panne.\par
+	On obtient ainsi 
+	\begin{align*}
+	    P\left(\text{panne}\right) &= 1 - P\left(\text{aucune panne}\right)\\
+	    &= 1 - P_{\M,\F,\C}\left(1,1,1\right)\\
+	    &= \num{0.9713}
+	\end{align*}
+	Ce résultat a été obtenu grâce au script \texttt{Q2a}.
+	\subsection{Panne de la machine \(\F\) connaissant \(\M\) et \(\C\)}
+	De la même manière qu'au point \ref{subsec:subsec_Q2a}, on peut déterminer la probabilité que la machine $\F$ tombe en panne sachant que les machines $\M$ et $\C$ ne tomberont pas en panne au cours du mois en déterminant la probabilité de l'événement contraire, à savoir la probabilité que la machine \(\F\) ne tombe pas en panne dans ces mêmes conditions.\par
+	On a alors, en se servant de la valeur déjà calculée au point \ref{subsec:subsec_Q1c},
+	\begin{align*}
+	    P_{\F|\M,\C}\left(2,3|1,1\right) &= 1 - P_{\F|\M,\C}\left(1|1,1\right)\\
+	    &= \num{0.59}
+	\end{align*}
+	Ce résultat a été obtenu grâce au script \texttt{Q2b}.
+	\section{Coût moyen des pannes}
+	\subsection{Coût moyen et variance par machine}
+	\label{sec:sec_Q3a}
+	Le coût\footnote{Dans ce rapport, chaque coût mentionné est un coût par mois.} moyen de réparation d'une machine correspond à la moyenne de ses coûts, pondérée par les probabilités marginales associées à ces coûts (calculées à la section \ref{sec:prob_marg}). Il s'agit en fait de l'espérance des coûts.\par
+	Le script \texttt{Q3a} multiplie chaque coût par sa probabilité marginale et somme le tout. On obtient les résultats présentés au tableau \ref{tab:tab_Q3a}.\par
+	\begin{table}[!ht]
+	    \centering
+	    \begin{tabular}{|l|c|c|c|}
+	        \hline
+	        \textbf{Machine} & \(\M\) & \(\F\) & \(\C\)\\
+	        \hline
+	        \hline
+	        \textbf{Coût moyen} [\euro{}] & \(\num{7760}\) & \(\num{9090}\) & \(\num{28790}\)\\
+	        \hline
+	        \textbf{Variance} [\euro{}\(^2\)] & \(\num{42302400}\) & \(\num{55882000}\) & \(\num{395505900}\)\\
+	        \hline
+	    \end{tabular}
+	    \caption{Coût moyen et variance des coûts de réparation de chaque machine.}
+	    \label{tab:tab_Q3a}
+	\end{table}
+	Les variances de chaque machine ont été calculées avec la fonction \texttt{var} de Matlab, prenant en premier argument le vecteur des coûts de réparation, et en second argument le vecteur des probabilités marginales associées à ces coûts.\par
+	Les résultats sont également présentés au tableau \ref{tab:tab_Q3a} et correspondent bien à l'application de la définition de la variance.
+	\begin{align*}
+	    V\left\{\X\right\} &= E\left\{\left(\X - E\left\{\X\right\}\right)^2\right\}\\
+	    &= E\left\{\X^2\right\} - E\left\{\X\right\}^2
+	\end{align*}
+	\subsection{La fonction coût}
+	Soit la fonction coût \(\phi\left(\M, \F, \C\right) = \K_\M + \K_\F + \K_\C\). Elle représente le coût de réparation à payer pour une combinaison possible de pannes des machines \(\M\), \(\F\) et \(\C\).
+	\subsubsection{Espérance et variance}
+	\label{subsec:subsec_Q3b_i}
+	L'espérance de la fonction \(\phi\) correspond à la moyenne de toutes les valeurs que peut prendre \(\phi\) (qui correspondent à toutes les combinaisons possibles de pannes pouvant survenir), pondérée par les probabilités associées à ces valeurs (fournies dans la matrice \texttt{MFC}).\par
+	Mathématiquement, on a
+	\begin{displaymath}
+	    E\left\{\phi\left(\M, \F, \C\right)\right\} = \sum_{i=1}^{4}\sum_{j=1}^{3}\sum_{k=1}^{5}\phi\left(i,j,k\right)P_{\M,\F,\C}\left(i,j,k\right)
+	\end{displaymath}
+	La variance, quant à elle, est obtenue en appliquant sa définition:
+	\begin{align*}
+	    V\left\{\phi\left(\M, \F, \C\right)\right\} &= E\left\{\left(\phi\left(\M, \F, \C\right) - E\left\{\phi\left(\M, \F, \C\right)\right\}\right)^2\right\}\\
+	    &= \sum_{i=1}^{4}\sum_{j=1}^{3}\sum_{k=1}^{5}\left(\phi\left(i,j,k\right) - E\left\{\phi\left(\M, \F, \C\right)\right\}\right)^2P_{\M,\F,\C}\left(i,j,k\right)
+	\end{align*}
+	Les résultats, obtenus grâce au script \texttt{Q3b} implémentant les relations explicitées précédemment, sont présentés au tableau \ref{tab:tab_Q3b}.
+	\begin{table}[!ht]
+	    \centering
+	    \begin{tabular}{|c|c|}
+	        \hline
+	        \textbf{Espérance} [\euro{}] & \textbf{Variance} [\euro{}\(^2\)]\\
+	        \hline
+	        \hline
+	        \(\num{45640}\) & \(\num{532521600}\)\\
+	        \hline
+	    \end{tabular}
+	    \caption{Espérance et variance de la fonction \(\phi\).}
+	    \label{tab:tab_Q3b}
+	\end{table}
+	\subsubsection{Notion concrète associée à l'espérance}
+	L'espérance de \(\phi\) est la moyenne pondérée de tous les coûts de réparation possibles. Concrètement, elle correspond donc à ce que devra payer en moyenne, chaque mois, l'entreprise pour la réparation de ses machines.
+	\subsubsection{Relation entre les différentes espérances et variances}
+	L'espérance étant définie avec un opérateur linéaire, l'espérance d'une combinaison linéaire de variables aléatoires est la combinaison linéaire des espérances de ces variables.\par
+	L'espérance de la fonction \(\phi\), calculée au point \ref{subsec:subsec_Q3b_i}, est donc égale à la somme des espérances (coûts moyens) de chaque machine, calculées au point \ref{sec:sec_Q3a}.
+	\begin{displaymath}
+	    E\left\{\phi\left(\M, \F, \C\right)\right\} = E\left\{\K_\M\right\} + E\left\{\K_\F\right\} + E\left\{\K_\C\right\}
+	\end{displaymath}
+	Cette égalité, testée avec Matlab, est bien vérifiée.\par
+	En ce qui concerne les variances, cette égalité n'est pas vérifiée. En effet, la variance d'une combinaison linéaire de variables aléatoires est calculée avec une hypothèse d'indépendance des variables. Les variables de ce problème n'étant pas toutes indépendantes, un terme supplémentaire de \textit{covariance} apparaît.
+	\begin{displaymath}
+	    V\left\{\phi\left(\M, \F, \C\right)\right\} = V\left\{\K_\M\right\} + V\left\{\K_\F\right\} + V\left\{\K_\C\right\} + 2\cdot\text{cov}\left\{\K_\F;\K_\C\right\}
+	\end{displaymath}
+	\subsection{État de la machine \(\M\) connu}
+	\subsubsection{Espérance et variance conditionnelles}
+	\label{subsec:subsec_Q3c_i}
+	L'espérance et la variance conditionnelles, pour chaque valeur de \(\M\) fixée (\(\forall i = 1,2,3,4\)), sont données par
+	\begin{align*}
+	    E\left\{\phi\left(\M,\F,\C\right)|\M\right\} &= \sum_{j=1}^{3}\sum_{k=1}^{5}\phi\left(i,j,k\right)\dfrac{P_{\M, \F, \C}\left(i,j,k\right)}{P_\M\left(i\right)}\\
+	    V\left\{\phi\left(\M, \F, \C\right)|\M\right\} &= \sum_{j=1}^{3}\sum_{k=1}^{5}\left(\phi\left(i, j, k\right) - E\left\{\phi\left(i,j,k\right)|i\right\}\right)^2\dfrac{P_{\M, \F, \C}\left(i, j, k\right)}{P_\M\left(i\right)}\\
+	\end{align*}
+	Ces formules ont été implémentées dans le script \texttt{Q3c}. Les résultats obtenus sont présentés au tableau \ref{tab:tab_Q3c}.\par
+	\begin{table}[!ht]
+	    \centering
+	    \begin{tabular}{|l|c|c|c|c|}
+	        \hline
+	        \textbf{Type de panne} & \(\M = 1\) & \(\M = 2\) & \(\M = 3\) & \(\M = 4\)\\
+	        \hline
+	        \hline
+	        \textbf{Espérance} [\euro{}] & \(\num{37880}\) & \(\num{49880}\) & \(\num{42880}\) & \(\num{54880}\)\\
+	        \hline
+	        \textbf{Variance} [\euro{}\(^2\)] & \(\num{490219200}\) & \(\num{490219200}\) & \(\num{490219200}\) & \(\num{490219200}\)\\
+	        \hline
+	    \end{tabular}
+	    \caption{Espérance et variance conditionnelles de \(\phi\) connaissant \(\M\).}
+	    \label{tab:tab_Q3c}
+	\end{table}
+	On constate que la variance est identique dans tous les cas. On déduit une nouvelle fois que la variable \(\M\) est indépendante de \(\F\) et \(\C\).
+	\subsubsection{Théorème de l'espérance totale}
+	Le théorème de l'espérance totale stipule que
+	\begin{displaymath}
+	    E\left\{E\left\{\phi\left(\M,\F,\C\right)|\M\right\}\right\} = E\left\{\phi\left(\M,\F,\C\right)\right\}
+	\end{displaymath}
+	Cela signifie qu'en considérant \(E\left\{\phi\left(\M,\F,\C\right)|\M\right\}\) comme une variable aléatoire, son espérance doit être égale à l'espérance de \(\phi\) calculée au point \ref{subsec:subsec_Q3b_i}.\par
+	Le script \texttt{Q3c} vérifie ce résultat en multipliant chaque valeur de l'espérance conditionnelle par la probabilité marginale de la valeur \(\M\) correspondante et en sommant le tout. Le résultat obtenu est identique à l'espérance de \(\phi\) calculée précédemment; le théorème est bien vérifié.
+	\subsubsection{Théorème de la variance totale}
+	Le théorème de la variance totale stipule que
+	\begin{equation}
+	    \label{eq:eq_Q3c_iii}
+	    V\left\{\phi\left(\M,\F,\C\right)\right\} = E\left\{V\left\{\phi\left(\M,\F,\C\right)|\M\right\}\right\} + V\left\{E\left\{\phi\left(\M,\F,\C\right)|\M\right\}\right\}
+	\end{equation}
+	En considérant \(V\left\{\phi\left(\M,\F,\C\right)|\M\right\}\) comme une variable aléatoire, le premier terme du membre de droite de \eqref{eq:eq_Q3c_iii} se calcule en multipliant chaque valeur de cette variable par la probabilité marginale de \(\M\) correspondante et en sommant le tout.\par
+	Le second terme du membre de droite de \eqref{eq:eq_Q3c_iii} se calcule en appliquant la définition de la variance:
+	\begin{align*}
+	    V\left\{E\left\{\phi\left(\M,\F,\C\right)|\M\right\}\right\} &= E\left\{\left(E\left\{\phi\left(\M,\F,\C\right)|\M\right\} - E\left\{E\left\{\phi\left(\M,\F,\C\right)|\M\right\}\right\}\right)^2\right\}\\
+	    &= E\left\{\left(E\left\{\phi\left(\M,\F,\C\right)|\M\right\} - \num{45640}\right)^2\right\}
+	\end{align*}
+	Le script \texttt{Q3c} implémente l'égalité \eqref{eq:eq_Q3c_iii} en utilisant les éléments calculés auparavant. Le résultat obtenu est identique à la variance de \(\phi\) calculée précédemment; le théorème est bien vérifié.
+	\section{Borne supérieure du coût des pannes}
+	\subsection{Borne supérieure du coût de réparation pour chaque machine}
+	\subsubsection{Aucune information sur la loi de répartition}
+	\label{subsec:subsec_Q4a_i}
+	Ne connaissant pas la loi de répartition des coûts des pannes, une méthode pour borner ces coûts serait d'utiliser l'inégalité de Bienaymé-Tchebyshev:
+	\begin{displaymath}
+	    P\left(\left|\X - \mu_\X\right|\geq c\sigma_{X}\right)\leq\dfrac{1}{c^2}
+	\end{displaymath}
+	avec \(\mu_\X\) l'espérance et \(\sigma_\X\) l'écart-type.\par
+	En effet, celle-ci permet de borner la valeur que peut prendre une variable aléatoire \(\X\), peu importe sa répartition.\par
+	Puisque l'on veut que la probabilité que le coût soit supérieur à la borne soit inférieure ou égale à \(\num{0.05}\), on fixe \(c^2\) à \(\num{20}\).\par
+	On a
+	\begin{displaymath}
+	    P\left(\X\geq\sqrt{20}\sigma_\X + \mu_\X\right)\leq\dfrac{1}{20}
+	\end{displaymath}
+	avec \(\sqrt{20}\sigma_\X + \mu_\X\), la borne pour chaque coût. Les espérances et écart-types étant connus, le script \texttt{Q4a}, implémentant le calcul de cette borne, fournit les résultats du tableau \ref{tab:tab_Q4a_i}.\par
+	\begin{table}[!ht]
+	    \centering
+	    \begin{tabular}{|c|c|c|c|}
+	        \hline
+	        \multirow{2}{*}{\textbf{Type de panne}} & \multicolumn{3}{c|}{\textbf{Bornes supérieures} [\euro{}]}\\ \cline{2-4}
+	        & \(\bm{\M}\) & \(\bm{\F}\) & \(\bm{\C}\)\\
+	        \hline
+	        \hline
+	        1 & \num{0} & \num{0} & \num{0}\\
+	        \hline
+	        2 & \num{14683} & \num{9671} & \num{37236}\\
+	        \hline
+	        3 & \num{6342} & \num{19789} & \num{16565}\\
+	        \hline
+	        4 & \num{18789} & \textbackslash & \num{60143}\\
+	        \hline
+	        5 & \textbackslash & \textbackslash & \num{53367}\\
+	        \hline
+	    \end{tabular}
+	    \caption{Bornes supérieures des pannes de chaque machine, dans le cas où la loi de répartition est inconnue.}
+	    \label{tab:tab_Q4a_i}
+	\end{table}
+	\paragraph{Remarque} Les \(0\) du tableau \ref{tab:tab_Q4a_i} pourraient être remplacés par des \texttt{NaN} car il n'est théoriquement pas possible de trouver des bornes supérieures aux coûts dans ces cas précis.
+	\subsubsection{Répartition normale}
+	En sachant que la loi de répartition des coûts des pannes suit une loi normale, le problème consiste en la recherche du \(x\) tel que
+	\begin{displaymath}
+	    P\left(\X > x\right)\leq\num{0.05}
+	\end{displaymath}
+	En transformant le problème,
+	\begin{equation}
+	    \label{eq:eq_normal}
+	    P\left(\X < x\right)\geq 1-\num{0.05}
+	\end{equation}
+	on peut se servir de la fonction de répartition de la loi de Gauss pour déterminer \(x\). Il faut également tenir compte que, pour chaque cas, l'espérance et l'écart-type ne sont pas les mêmes.\par
+	En utilisant la fonction \texttt{norminv} (cette fonction permet de déterminer le \(x\) de la relation \eqref{eq:eq_normal} en fournissant une approximation numérique de la répartition gaussienne considérée \og à l'envers\fg{}, \cad en isolant le \(x\)) de Matlab, avec comme arguments \(\num{1-0.05}\), l'espérance et l'écart-type du cas concerné, le script \texttt{Q4a} fournit les résultats du tableau \ref{tab:tab_Q4a_ii}.\par
+	\begin{table}[!ht]
+	    \centering
+	    \begin{tabular}{|c|c|c|c|}
+	        \hline
+	        \multirow{2}{*}{\textbf{Type de panne}} & \multicolumn{3}{c|}{\textbf{Bornes supérieures} [\euro{}]}\\ \cline{2-4}
+	        & \(\bm{\M}\) & \(\bm{\F}\) & \(\bm{\C}\)\\
+	        \hline
+	        \hline
+	        1 & \texttt{NaN} & \texttt{NaN} & \texttt{NaN}\\
+	        \hline
+	        2 & \num{12987} & \num{9247} & \num{35822}\\
+	        \hline
+	        3 & \num{5493} & \num{18658} & \num{15576}\\
+	        \hline
+	        4 & \num{17658} & \textbackslash & \num{56892}\\
+	        \hline
+	        5 & \textbackslash & \textbackslash & \num{49974}\\
+	        \hline
+	    \end{tabular}
+	    \caption{Bornes supérieures des pannes de chaque machine, dans le cas où la loi de répartition est une loi normale.}
+	    \label{tab:tab_Q4a_ii}
+	\end{table}
+	Les \texttt{NaN} renvoyés par la fonction \texttt{norminv} rejoignent la remarque précédente: dans ces cas précis, il n'est pas possible de trouver des bornes supérieures aux coûts.
+	\subsubsection{Comparaison des résultats}
+	On constate que toutes les bornes calculées en connaissant la loi de répartition sont inférieures ou égales à celles calculées avec l'inégalité de Bienaymé-Tchebyshev.\par
+	Ceci est du au fait que les bornes calculées avec cette inégalité sont des bornes absolues, \cad des bornes générales valables pour tous les types de répartition.\par
+	Dès lors, il est certain que même si on supposait un autre type de répartition, les bornes calculées avec celui-ci seront toujours inférieures à celles calculées au point \ref{subsec:subsec_Q4a_i}.
+	\appendix
+	\restoregeometry
+	\section{Code Matlab}
+	\subsection{Scripts}
+	\subsubsection*{Question 1}
+	\lstinputlisting[style=MyMatLab, caption=Script \texttt{Q1a.m}.]{resources/m/Q1a.m}
+	\lstinputlisting[style=MyMatLab, caption=Script \texttt{Q1b.m}.]{resources/m/Q1b.m}
+	\lstinputlisting[style=MyMatLab, caption=Script \texttt{Q1c.m}.]{resources/m/Q1c.m}
+	\subsubsection*{Question 2}
+	\lstinputlisting[style=MyMatLab, caption=Script \texttt{Q2a.m}.]{resources/m/Q2a.m}
+	\lstinputlisting[style=MyMatLab, caption=Script \texttt{Q2b.m}.]{resources/m/Q2b.m}
+	\subsubsection*{Question 3}
+	\lstinputlisting[style=MyMatLab, caption=Script \texttt{Q3a.m}.]{resources/m/Q3a.m}
+	\lstinputlisting[style=MyMatLab, caption=Script \texttt{Q3b.m}.]{resources/m/Q3b.m}
+	\lstinputlisting[style=MyMatLab, caption=Script \texttt{Q3c.m}.]{resources/m/Q3c.m}
+	\subsubsection*{Question 4}
+	\lstinputlisting[style=MyMatLab, caption=Script \texttt{Q4a.m}.]{resources/m/Q4a.m}
+	\subsection{Scripts et fonctions auxiliaires}
+	\lstinputlisting[style=MyMatLab, caption=Fonction \texttt{readFile.m}.]{resources/m/readFile.m}
+	\lstinputlisting[style=MyMatLab, caption=Script \texttt{getCost.m}.]{resources/m/getCost.m}
+\end{document}
